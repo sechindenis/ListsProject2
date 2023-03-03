@@ -7,3 +7,8 @@ int Differ(int a, int b)
 {
     return a - b; 
 }
+
+double Divide(int a, int b)
+{
+    return a / b;
+}
