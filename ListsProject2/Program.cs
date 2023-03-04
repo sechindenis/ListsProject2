@@ -12,3 +12,5 @@ double Divide(int a, int b)
 {
     return a / b;
 }
+
+int[] a = new int[1] { 5 };
