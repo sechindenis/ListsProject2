@@ -3,6 +3,8 @@
     public class ArrayList
     {
         private int[] _array;
+
+        private int _length;
         
         // 23. Создать три конструктора
         // пустой конструктор
@@ -33,9 +35,10 @@
             }
         }
 
-        // пользовательская длина списка
+        // пользовательская длина списка - В ЧЕМ СМЫСЛ добавления условий?
         public int Length { get; private set; }
 
+        // МЕТОДЫ
         // 1. Добавление значения в конец
         public void Add(int value)
         {
@@ -56,11 +59,7 @@
                 UpSize();
             }
 
-            for (int i = Length; i > 0; i--)
-            {
-                _array[i] = _array[i - 1];
-            }
-
+            MoveRightFromIndex(0);
             _array[0] = value;
             Length++;
         }
@@ -70,7 +69,7 @@
         {
             if (index < 0 || index >= Length)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new IndexOutOfRangeException("index");
             }
             
             if (Length == _array.Length)
@@ -78,11 +77,7 @@
                 UpSize();
             }
 
-            for (int i = Length; i > index; i--)
-            {
-                _array[i] = _array[i - 1];
-            }
-
+            MoveRightFromIndex(index);
             _array[index] = value;
             Length++;
         }
@@ -95,7 +90,6 @@
                 return false;
             }
 
-            _array[Length - 1] = 0;
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -114,10 +108,7 @@
                 return false;
             }
 
-            for (int i = 0; i < Length; i++)
-            {
-                _array[i] = _array[i + 1];
-            }
+            MoveLeftNextFromIndex(1);
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -133,13 +124,10 @@
         {
             if (index < 0 || index >= Length)
             {
-                throw new ArgumentOutOfRangeException("index"); // return false;
+                throw new IndexOutOfRangeException("index"); // return false;
             }
 
-            for (int i = index; i < Length; i++)
-            {
-                _array[i] = _array[i + 1];
-            }
+            MoveLeftNextFromIndex(index + 1);
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -168,37 +156,252 @@
             }
             else
             {
-
+                // дописать
             } 
 
             return true;
         }
 
-        // 10. Вернуть длину
-        public int GetLength()
-        {
-            return Length;
-        }
-
-        // 11. Вернуть длину
-        public int GetElement(int index)
+        // 11. Доступ по индексу
+        public int GetValueByIndex(int index)
         {
             if (index < 0 || index >= Length)
             {
-                throw new ArgumentOutOfRangeException("index"); // return false;
+                throw new IndexOutOfRangeException("index"); // return false;
             }
 
             return _array[index];
         }
 
+        // 12. Доступ по индексу
+        public int GetIndexByValue(int value)
+        {
+            int index = -1;
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    index = i; 
+                    break;
+                }
+            }
+
+            return index;
+        }
+
+        // 13. Доступ по индексу - ПЕРЕДЕЛАТЬ
+        public void ChangeValueByIndex(int index, int value)
+        {
+            if (index < 0 || index >= Length)
+            {
+                throw new IndexOutOfRangeException("index");
+            }
+
+            _array[index] = value;
+        }
+
+        // 14. Реверс
+        public void Reverse()
+        {
+            for (int i = 0; i < Length / 2; i++)
+            {
+                int tmp = _array[i];
+                _array[i] = _array[Length - 1 - i];
+                _array[Length - 1 - i] = tmp;
+            }
+        }
+
+        // 15. Поиск значения максимального элемента
+        public int FindMaxValue()
+        {
+            if (Length == 0)
+            {
+                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+            }
+            
+            int maxValue = _array[0];
+
+            for (int i = 1; i < Length; i++)
+            {
+                if (_array[i] > maxValue)
+                {
+                    maxValue = _array[i];
+                }
+            }
+
+            return maxValue;
+        }
+
+        // 16. Поиск значения минимального элемента
+        public int FindMinValue()
+        {
+            if (Length == 0)
+            {
+                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+            }
+
+            int minValue = _array[0];
+
+            for (int i = 1; i < Length; i++)
+            {
+                if (_array[i] < minValue)
+                {
+                    minValue = _array[i];
+                }
+            }
+
+            return minValue;
+        }
+
+        // 17. Поиск индекса максимального элемента
+        public int FindMaxValueIndex()
+        {
+            if (Length == 0)
+            {
+                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+            }
+
+            int maxIndex = 0;
+
+            for (int i = 1; i < Length; i++)
+            {
+                if (_array[i] > maxIndex)
+                {
+                    maxIndex = i;
+                }
+            }
+
+            return maxIndex;
+        }
+
+        // 18. Поиск индекса минимального элемента
+        public int FindMinValueIndex()
+        {
+            if (Length == 0)
+            {
+                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+            }
+
+            int minIndex = 0;
+
+            for (int i = 1; i < Length; i++)
+            {
+                if (_array[i] < minIndex)
+                {
+                    minIndex = i;
+                }
+            }
+
+            return minIndex;
+        }
+
+        // 19. Сортировка по возрастанию
+        public void UpSort()
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                for (int j = Length - 1; j > i; j--)
+                {
+                    if (_array[i] > _array[j])
+                    {
+                        int tmp = _array[i];
+                        _array[i] = _array[j];
+                        _array[j] = tmp;
+                    }
+                }
+            }
+        }
+
+        // 20. Сортировка по убыванию
+        public void DownSort()
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                for (int j = Length - 1; j > i; j--)
+                {
+                    if (_array[i] < _array[j])
+                    {
+                        int tmp = _array[i];
+                        _array[i] = _array[j];
+                        _array[j] = tmp;
+                    }
+                }
+            }
+        }
+
+        // 21. Удаление по значению первого
+        public int RemoveOneByValue(int value)
+        {
+            int index = -1;
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            MoveLeftNextFromIndex(index);
+            Length--;
+
+            return index;
+        }
+
+        // 22 первая попытка. Удаление по значению всех
+        public int RemoveAllByValueFIRST(int value)
+        {
+            int count = 0;
+            int start = 0;
+            count += RemoveAndMoveLeft(start, count, value);
+
+            return count;
+        }
+        // вспомогательный метод к "22 первая попытка" (рекурсивный метод, передвигающий массив начиная с элемента влево на один)
+        private int RemoveAndMoveLeft(int start, int count, int value)
+        {
+            for (int i = start; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    count++;
+                    MoveLeftNextFromIndex(i);
+                    Length--;
+                    count = RemoveAndMoveLeft(i, count, value);
+                }
+            }
+
+            return count;
+        }
+
+        // 22 вторая попытка. Удаление по значению всех
+        public int RemoveAllByValueSECOND(int value)
+        {
+            int[] tmp = new int[0];
+            int count = 0;
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    count++;
+                }
+                else
+                {
+                    Array.Resize<int>(ref tmp, tmp.Length + 1);
+                    tmp[tmp.Length - 1] = _array[i];
+                }
+            }
+
+            _array = tmp;
+            Length -= count;
+
+            return count;
+        }
+        
         // приватные
-        //private void PassValuesToAnotherArray(int[] oneArray, int[] anotherArray)
-        //{
-        //    for (int i = 0; i < _array.Length; i++)
-        //    {
-        //        tmpArray[i] = _array[i];
-        //    }
-        //}
 
         private void UpSize()
         {
@@ -224,6 +427,22 @@
             }
 
             _array = tmpArray;
+        }
+
+        private void MoveRightFromIndex(int index)
+        {
+            for (int i = Length; i > index; i--)
+            {
+                _array[i] = _array[i - 1];
+            }
+        }
+
+        private void MoveLeftNextFromIndex(int index)
+        {
+            for (int i = index; i < Length - 1; i++)
+            {
+                _array[i] = _array[i + 1];
+            }
         }
     }
 }

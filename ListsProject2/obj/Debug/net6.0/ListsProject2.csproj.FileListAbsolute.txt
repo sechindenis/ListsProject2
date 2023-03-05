@@ -1,0 +1,15 @@
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\bin\Debug\net6.0\ListsProject2.exe
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\bin\Debug\net6.0\ListsProject2.deps.json
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\bin\Debug\net6.0\ListsProject2.runtimeconfig.json
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\bin\Debug\net6.0\ListsProject2.dll
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\bin\Debug\net6.0\ListsProject2.pdb
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.csproj.AssemblyReference.cache
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.AssemblyInfoInputs.cache
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.AssemblyInfo.cs
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.csproj.CoreCompileInputs.cache
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.dll
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\refint\ListsProject2.dll
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.pdb
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ListsProject2.genruntimeconfig.cache
+C:\Users\sechi\OneDrive\Рабочий стол\projects 2\ListsProject2\ListsProject2\obj\Debug\net6.0\ref\ListsProject2.dll

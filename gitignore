@@ -10,7 +10,7 @@
 _build/
 _site/
 Properties/
-
+.dll
 
 
 Project_Readme.html
