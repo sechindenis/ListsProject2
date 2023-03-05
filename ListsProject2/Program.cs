@@ -24,3 +24,5 @@ Console.WriteLine();
 
 //arrayOfIndexes = { 1, 4, 5, 7 }
 
+int d = 0;
+
