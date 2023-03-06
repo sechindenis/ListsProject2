@@ -4,7 +4,27 @@
     {
         private int[] _array;
 
-        private int _length;
+        public int this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                return _array[index];
+            }
+            set
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                _array[index] = value;
+            }
+        }
         
         // 23. Создать три конструктора
         // пустой конструктор
@@ -26,13 +46,8 @@
         public ArrayList(int[] array)
         {
             Length = array.Length;
-            int _arrayLength = (int)(array.Length * 1.33d + 1);
-            _array = new int[_arrayLength];
-
-            for (int i = 0; i < Length; i++)
-            {
-                _array[i] = array[i];
-            }
+            _array = array;
+            UpSize();
         }
 
         // пользовательская длина списка - В ЧЕМ СМЫСЛ добавления условий?
@@ -83,7 +98,7 @@
         }
 
         // 4. Удаление из конца одного элемента
-        public bool RemoveLastElement()
+        public bool Remove()
         {
             if (Length == 0)
             {
@@ -101,14 +116,14 @@
         }
 
         // 5. Удаление из начала одного элемента
-        public bool RemoveFirstElement()
+        public bool RemoveAtBegining()
         {
             if (Length == 0)
             {
                 return false;
             }
 
-            MoveLeftNextFromIndex(1);
+            MoveLeftFromIndex(1);
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -127,7 +142,7 @@
                 throw new IndexOutOfRangeException("index"); // return false;
             }
 
-            MoveLeftNextFromIndex(index + 1);
+            MoveLeftFromIndex(index + 1);
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -138,10 +153,8 @@
             return true;
         }
 
-        // 7. Удаление из конца N элементов -
-        // В ЭТОЙ И В 8-9 ЗАДАЧАХ УТОЧНИТЬ МЕХАНИЗМ ИЗМЕНЕНИЯ РАЗМЕРА
-        // УТОЧНИТЬ ФОРМАТ МЕТОДА
-        public bool RemoveFromEnd(int number)
+        // 7. Удаление из конца N элементов
+        public bool Remove(int number)
         {
             if (number > Length)
             {
@@ -150,30 +163,69 @@
 
             Length -= number;
 
-            if (Length == _array.Length / 2 - 1)
+            if (Length <= _array.Length / 2 - 1)
             {
-                DownSize();
+                int newLength = (int)(Length * 1.33d + 1);
+                ChangeLength(newLength);
             }
-            else
-            {
-                // дописать
-            } 
 
             return true;
         }
 
-        // 11. Доступ по индексу
-        public int GetValueByIndex(int index)
+        // 8. Удаление из начала N элементов
+        public bool RemoveAtBegining(int number)
+        {
+            if (number > Length)
+            {
+                throw new ArgumentOutOfRangeException("number > Length");
+            }
+
+            for (int i = 0; i < Length - number; i++)
+            {
+                _array[i] = _array[i + number];
+            }
+            
+            Length -= number;
+
+            if (Length <= _array.Length / 2 - 1)
+            {
+                int newLength = (int)(Length * 1.33d + 1);
+                ChangeLength(newLength);
+            }
+
+            return true;
+        }
+
+        // 9. Удаление N элементов по индексу
+        public bool RemoveAt(int index, int number)
         {
             if (index < 0 || index >= Length)
             {
-                throw new IndexOutOfRangeException("index"); // return false;
+                throw new IndexOutOfRangeException("index");
             }
 
-            return _array[index];
+            if (number > Length - index)
+            {
+                throw new ArgumentOutOfRangeException("index + number > Length");
+            }
+
+            for (int i = index; i < Length - number; i++)
+            {
+                _array[i] = _array[i + number];
+            }
+
+            Length -= number;
+
+            if (Length <= _array.Length / 2 - 1)
+            {
+                int newLength = (int)(Length * 1.33d + 1);
+                ChangeLength(newLength);
+            }
+
+            return true;
         }
 
-        // 12. Доступ по индексу
+        // 12. Первый индкс по значению
         public int GetIndexByValue(int value)
         {
             int index = -1;
@@ -188,17 +240,6 @@
             }
 
             return index;
-        }
-
-        // 13. Доступ по индексу - ПЕРЕДЕЛАТЬ
-        public void ChangeValueByIndex(int index, int value)
-        {
-            if (index < 0 || index >= Length)
-            {
-                throw new IndexOutOfRangeException("index");
-            }
-
-            _array[index] = value;
         }
 
         // 14. Реверс
@@ -344,13 +385,14 @@
                 }
             }
 
-            MoveLeftNextFromIndex(index);
+            MoveLeftFromIndex(index + 1);
             Length--;
 
             return index;
         }
 
-        // 22 первая попытка. Удаление по значению всех
+        // 22. Удаление по значению всех
+        // первая попытка - аж стыдно за этот ужас...
         public int RemoveAllByValueFIRST(int value)
         {
             int count = 0;
@@ -359,7 +401,8 @@
 
             return count;
         }
-        // вспомогательный метод к "22 первая попытка" (рекурсивный метод, передвигающий массив начиная с элемента влево на один)
+
+        // вспомогательный метод к первой попытке (рекурсивный метод, передвигающий массив начиная с элемента влево на один)
         private int RemoveAndMoveLeft(int start, int count, int value)
         {
             for (int i = start; i < Length; i++)
@@ -367,7 +410,7 @@
                 if (_array[i] == value)
                 {
                     count++;
-                    MoveLeftNextFromIndex(i);
+                    MoveLeftFromIndex(i + 1);
                     Length--;
                     count = RemoveAndMoveLeft(i, count, value);
                 }
@@ -376,7 +419,7 @@
             return count;
         }
 
-        // 22 вторая попытка. Удаление по значению всех
+        // вторая попытка
         public int RemoveAllByValueSECOND(int value)
         {
             int[] tmp = new int[0];
@@ -400,33 +443,130 @@
 
             return count;
         }
-        
-        // приватные
 
+        // 24. Добавление массива в конец
+        // первая попытка - название предполагается без "FIRST"
+        public void AddFIRST(int[] value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                Add(value[i]);
+            }
+        }
+
+        // вторая попытка, вроде бы более эффективно по количеству действий - название предполагается без "SECOND"
+        public void AddSECOND(int[] value)
+        {
+            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
+
+            if (_array.Length < requiredLength)
+            {
+                ChangeLength(requiredLength);
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                _array[i + Length] = value[i];
+            }
+
+            Length += value.Length;
+        }
+
+        // 25. Добавление массива в начало
+        public void AddToBegining(int[] value)
+        {
+            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
+
+            if (_array.Length < requiredLength)
+            {
+                ChangeLength(requiredLength);
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                _array[i + Length] = value[i];
+            }
+
+            Length += value.Length;
+        }
+
+        // 26. Добавление массива в начало
+        public void InsertAt(int index, int[] value)
+        {
+            if (index < 0 || index >= Length)
+            {
+                throw new IndexOutOfRangeException("index");
+            }
+
+            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
+
+            if (_array.Length < requiredLength)
+            {
+                ChangeLength(requiredLength);
+            }
+
+            for (int i = Length - 1; i >= index; i--)
+            {
+                _array[i + value.Length] = _array[i];
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                _array[i + index] = value[i];
+            }
+
+            Length += value.Length;
+        }
+
+        // Перегрузка стандартных методов
+        public override bool Equals(object? obj)
+        {
+            ArrayList arrayList = (ArrayList)obj;
+
+            if (Length != arrayList.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (_array[i] != arrayList._array[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override string ToString()
+        {
+            string s = "";
+
+            for (int i = 0; i < Length; i++)
+            {
+                s += _array[i].ToString() + " ";
+            }
+
+            return s;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        // приватные
         private void UpSize()
         {
             int newLength = (int)(_array.Length * 1.33d + 1);
-            int[] tmpArray = new int[newLength];
-
-            for (int i = 0; i < _array.Length; i++)
-            {
-                tmpArray[i] = _array[i];
-            }
-
-            _array = tmpArray;
+            ChangeLength(newLength);
         }
 
         private void DownSize()
         {
             int newLength = (int)(_array.Length * 0.67d);
-            int[] tmpArray = new int[newLength];
-
-            for (int i = 0; i < Length; i++)
-            {
-                tmpArray[i] = _array[i];
-            }
-
-            _array = tmpArray;
+            ChangeLength(newLength);
         }
 
         private void MoveRightFromIndex(int index)
@@ -437,12 +577,24 @@
             }
         }
 
-        private void MoveLeftNextFromIndex(int index)
+        private void MoveLeftFromIndex(int index)
         {
-            for (int i = index; i < Length - 1; i++)
+            for (int i = index; i < Length; i++)
             {
-                _array[i] = _array[i + 1];
+                _array[i - 1] = _array[i];
             }
+        }
+
+        private void ChangeLength(int newLength)
+        {
+            int[] tmpArray = new int[newLength];
+
+            for (int i = 0; i < Length; i++)
+            {
+                tmpArray[i] = _array[i];
+            }
+
+            _array = tmpArray;
         }
     }
 }
