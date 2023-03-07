@@ -1,4 +1,6 @@
-﻿namespace ListsProject2
+﻿using System;
+
+namespace ListsProject2
 {
     public class ArrayList
     {
@@ -43,10 +45,15 @@
         }
 
         // конструктор на основе имеющегося массива
-        public ArrayList(int[] array)
+        public ArrayList(int[] values)
         {
-            Length = array.Length;
-            _array = array;
+            if (values is null)
+            {
+                throw new NullReferenceException("values is null");
+            }
+
+            Length = values.Length;
+            _array = values;
             UpSize();
         }
 
@@ -65,36 +72,106 @@
             _array[Length] = value;
             Length++;
         }
-        
-        // 2. Добавление значения в начало
-        public void AddToBegining(int value)
-        {
-            if (Length == _array.Length)
-            {
-                UpSize();
-            }
 
-            MoveRightFromIndex(0);
-            _array[0] = value;
-            Length++;
-        }
-
-        // 3. Добавление значения по индексу
-        public void InsertAt(int index, int value)
+        // 24. Добавление массива в конец
+        public void Add(int[] values)
         {
-            if (index < 0 || index >= Length)
+            if (values is null)
             {
-                throw new IndexOutOfRangeException("index");
+                throw new NullReferenceException("values is null");
             }
             
-            if (Length == _array.Length)
+            int requiredLength = (int)((Length + values.Length) * 1.33d + 1);
+
+            if (_array.Length < requiredLength)
             {
-                UpSize();
+                ChangeLength(requiredLength);
             }
 
-            MoveRightFromIndex(index);
-            _array[index] = value;
-            Length++;
+            InsertArrayAtIndex(Length, values);
+            Length += values.Length;
+        }
+
+        // 2-3. Добавление значения по индексу (в начале - по индексу 0)
+        public void InsertAt(int index, int value)
+        {
+            if (Length != 0)
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                if (Length == _array.Length)
+                {
+                    UpSize();
+                }
+
+                MoveRightFromIndexByNumber(index, 1);
+                _array[index] = value;
+                Length++;
+            }
+            else
+            {
+                Length = 1;
+
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                _array[index] = value;
+            }
+        }
+
+        // 25-26. Добавление массива по индексу (в начало - по индексу 0)
+        public void InsertAt(int index, int[] values)
+        {
+            if (Length != 0)
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                if (values is null)
+                {
+                    throw new NullReferenceException("values is null");
+                }
+
+                int requiredLength = (int)((Length + values.Length) * 1.33d + 1);
+
+                if (_array.Length < requiredLength)
+                {
+                    ChangeLength(requiredLength);
+                }
+
+                MoveRightFromIndexByNumber(index, values.Length);
+                InsertArrayAtIndex(index, values);
+                Length += values.Length;
+            }
+            else
+            {
+                if (index < 0 || index > 0)
+                {
+                    throw new IndexOutOfRangeException("index");
+                }
+
+                if (values is null)
+                {
+                    throw new NullReferenceException("values is null");
+                }
+
+                Length = values.Length;
+                int requiredLength = (int)((Length + values.Length) * 1.33d + 1);
+
+                if (_array.Length < requiredLength)
+                {
+                    ChangeLength(requiredLength);
+                }
+
+                InsertArrayAtIndex(index, values);
+            }
         }
 
         // 4. Удаление из конца одного элемента
@@ -105,44 +182,6 @@
                 return false;
             }
 
-            Length--;
-
-            if (Length == _array.Length / 2 - 1)
-            {
-                DownSize();
-            }
-
-            return true;
-        }
-
-        // 5. Удаление из начала одного элемента
-        public bool RemoveAtBegining()
-        {
-            if (Length == 0)
-            {
-                return false;
-            }
-
-            MoveLeftFromIndex(1);
-            Length--;
-
-            if (Length == _array.Length / 2 - 1)
-            {
-                DownSize();
-            }
-
-            return true;
-        }
-
-        // 6. Удаление одного элемента по индексу - УТОЧНИТЬ ФОРМАТ ВЫВОДА
-        public bool RemoveAt(int index)
-        {
-            if (index < 0 || index >= Length)
-            {
-                throw new IndexOutOfRangeException("index"); // return false;
-            }
-
-            MoveLeftFromIndex(index + 1);
             Length--;
 
             if (Length == _array.Length / 2 - 1)
@@ -171,32 +210,27 @@
 
             return true;
         }
-
-        // 8. Удаление из начала N элементов
-        public bool RemoveAtBegining(int number)
+        
+        // 5-6. Удаление одного элемента по индексу (в начале - по индексу 0)
+        public bool RemoveAt(int index)
         {
-            if (number > Length)
+            if (index < 0 || index >= Length)
             {
-                throw new ArgumentOutOfRangeException("number > Length");
+                throw new IndexOutOfRangeException("index"); // return false;
             }
 
-            for (int i = 0; i < Length - number; i++)
-            {
-                _array[i] = _array[i + number];
-            }
-            
-            Length -= number;
+            MoveLeftFromIndexByNumber(index + 1, 1);
+            Length--;
 
-            if (Length <= _array.Length / 2 - 1)
+            if (Length == _array.Length / 2 - 1)
             {
-                int newLength = (int)(Length * 1.33d + 1);
-                ChangeLength(newLength);
+                DownSize();
             }
 
             return true;
         }
 
-        // 9. Удаление N элементов по индексу
+        // 8-9. Удаление N элементов по индексу (в начале - по индексу 0)
         public bool RemoveAt(int index, int number)
         {
             if (index < 0 || index >= Length)
@@ -209,11 +243,7 @@
                 throw new ArgumentOutOfRangeException("index + number > Length");
             }
 
-            for (int i = index; i < Length - number; i++)
-            {
-                _array[i] = _array[i + number];
-            }
-
+            MoveLeftFromIndexByNumber(index + number, number);
             Length -= number;
 
             if (Length <= _array.Length / 2 - 1)
@@ -225,7 +255,7 @@
             return true;
         }
 
-        // 12. Первый индкс по значению
+        // 12. Первый индекс по значению
         public int GetIndexByValue(int value)
         {
             int index = -1;
@@ -385,42 +415,14 @@
                 }
             }
 
-            MoveLeftFromIndex(index + 1);
+            MoveLeftFromIndexByNumber(index + 1, 1);
             Length--;
 
             return index;
         }
 
         // 22. Удаление по значению всех
-        // первая попытка - аж стыдно за этот ужас...
-        public int RemoveAllByValueFIRST(int value)
-        {
-            int count = 0;
-            int start = 0;
-            count += RemoveAndMoveLeft(start, count, value);
-
-            return count;
-        }
-
-        // вспомогательный метод к первой попытке (рекурсивный метод, передвигающий массив начиная с элемента влево на один)
-        private int RemoveAndMoveLeft(int start, int count, int value)
-        {
-            for (int i = start; i < Length; i++)
-            {
-                if (_array[i] == value)
-                {
-                    count++;
-                    MoveLeftFromIndex(i + 1);
-                    Length--;
-                    count = RemoveAndMoveLeft(i, count, value);
-                }
-            }
-
-            return count;
-        }
-
-        // вторая попытка
-        public int RemoveAllByValueSECOND(int value)
+        public int RemoveAllByValue(int value)
         {
             int[] tmp = new int[0];
             int count = 0;
@@ -442,80 +444,6 @@
             Length -= count;
 
             return count;
-        }
-
-        // 24. Добавление массива в конец
-        // первая попытка - название предполагается без "FIRST"
-        public void AddFIRST(int[] value)
-        {
-            for (int i = 0; i < value.Length; i++)
-            {
-                Add(value[i]);
-            }
-        }
-
-        // вторая попытка, вроде бы более эффективно по количеству действий - название предполагается без "SECOND"
-        public void AddSECOND(int[] value)
-        {
-            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
-
-            if (_array.Length < requiredLength)
-            {
-                ChangeLength(requiredLength);
-            }
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                _array[i + Length] = value[i];
-            }
-
-            Length += value.Length;
-        }
-
-        // 25. Добавление массива в начало
-        public void AddToBegining(int[] value)
-        {
-            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
-
-            if (_array.Length < requiredLength)
-            {
-                ChangeLength(requiredLength);
-            }
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                _array[i + Length] = value[i];
-            }
-
-            Length += value.Length;
-        }
-
-        // 26. Добавление массива в начало
-        public void InsertAt(int index, int[] value)
-        {
-            if (index < 0 || index >= Length)
-            {
-                throw new IndexOutOfRangeException("index");
-            }
-
-            int requiredLength = (int)((Length + value.Length) * 1.33d + 1);
-
-            if (_array.Length < requiredLength)
-            {
-                ChangeLength(requiredLength);
-            }
-
-            for (int i = Length - 1; i >= index; i--)
-            {
-                _array[i + value.Length] = _array[i];
-            }
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                _array[i + index] = value[i];
-            }
-
-            Length += value.Length;
         }
 
         // Перегрузка стандартных методов
@@ -557,6 +485,18 @@
         }
 
         // приватные
+        private void ChangeLength(int newLength)
+        {
+            int[] tmpArray = new int[newLength];
+
+            for (int i = 0; i < Length; i++)
+            {
+                tmpArray[i] = _array[i];
+            }
+
+            _array = tmpArray;
+        }
+
         private void UpSize()
         {
             int newLength = (int)(_array.Length * 1.33d + 1);
@@ -569,32 +509,28 @@
             ChangeLength(newLength);
         }
 
-        private void MoveRightFromIndex(int index)
+        private void MoveRightFromIndexByNumber(int index, int number)
         {
-            for (int i = Length; i > index; i--)
+            for (int i = Length - 1; i >= index; i--)
             {
-                _array[i] = _array[i - 1];
+                _array[i + number] = _array[i];
             }
         }
 
-        private void MoveLeftFromIndex(int index)
+        private void MoveLeftFromIndexByNumber(int index, int number)
         {
             for (int i = index; i < Length; i++)
             {
-                _array[i - 1] = _array[i];
+                _array[i - number] = _array[i];
             }
         }
 
-        private void ChangeLength(int newLength)
+        private void InsertArrayAtIndex(int index, int[] values)
         {
-            int[] tmpArray = new int[newLength];
-
-            for (int i = 0; i < Length; i++)
+            for (int i = 0; i < values.Length; i++)
             {
-                tmpArray[i] = _array[i];
+                _array[i + index] = values[i];
             }
-
-            _array = tmpArray;
         }
     }
 }

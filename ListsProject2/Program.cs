@@ -3,7 +3,7 @@
 int[] ints= new int[] { 5, 1, 1, 4, 1, 1, 3, 6, 1, 5 };
 
 ArrayList one = new ArrayList(ints);
-Console.WriteLine(one.RemoveAllByValueSECOND(1));
+Console.WriteLine(one.RemoveAllByValue(1));
 
 for (int i = 0; i < one.Length; i++)
 {
