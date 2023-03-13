@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Security.Cryptography.X509Certificates;
 
 namespace ListsProject2
 {
@@ -57,7 +57,7 @@ namespace ListsProject2
             UpSize();
         }
 
-        // пользовательская длина списка - В ЧЕМ СМЫСЛ добавления условий?
+        // пользовательская длина списка
         public int Length { get; private set; }
 
         // МЕТОДЫ
@@ -92,7 +92,7 @@ namespace ListsProject2
             Length += values.Length;
         }
 
-        // 2-3. Добавление значения по индексу (в начале - по индексу 0)
+        // 2-3. Добавление значения по индексу (в начало - по индексу 0)
         public void InsertAt(int index, int value)
         {
             if (Length != 0)
@@ -195,9 +195,15 @@ namespace ListsProject2
         // 7. Удаление из конца N элементов
         public bool Remove(int number)
         {
-            if (number > Length)
+            if (number < 0 || number > Length)
             {
-                throw new ArgumentOutOfRangeException("number > Length");
+                //throw new ArgumentOutOfRangeException("number > Length");
+                return false;
+            }
+
+            if (Length == 0)
+            {
+                return false;
             }
 
             Length -= number;
@@ -216,7 +222,8 @@ namespace ListsProject2
         {
             if (index < 0 || index >= Length)
             {
-                throw new IndexOutOfRangeException("index"); // return false;
+                // throw new IndexOutOfRangeException("index"); 
+                return false;
             }
 
             MoveLeftFromIndexByNumber(index + 1, 1);
@@ -235,12 +242,14 @@ namespace ListsProject2
         {
             if (index < 0 || index >= Length)
             {
-                throw new IndexOutOfRangeException("index");
+                //throw new IndexOutOfRangeException("index");
+                return false;
             }
 
             if (number > Length - index)
             {
-                throw new ArgumentOutOfRangeException("index + number > Length");
+                //throw new ArgumentOutOfRangeException("index + number > Length");
+                return false;
             }
 
             MoveLeftFromIndexByNumber(index + number, number);
@@ -288,7 +297,7 @@ namespace ListsProject2
         {
             if (Length == 0)
             {
-                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+                throw new Exception("ArrayList object is empty");
             }
             
             int maxValue = _array[0];
@@ -309,7 +318,7 @@ namespace ListsProject2
         {
             if (Length == 0)
             {
-                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+                throw new Exception("ArrayList object is empty");
             }
 
             int minValue = _array[0];
@@ -330,14 +339,14 @@ namespace ListsProject2
         {
             if (Length == 0)
             {
-                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+                throw new Exception("ArrayList object is empty");
             }
 
             int maxIndex = 0;
 
             for (int i = 1; i < Length; i++)
             {
-                if (_array[i] > maxIndex)
+                if (_array[i] > _array[maxIndex])
                 {
                     maxIndex = i;
                 }
@@ -351,14 +360,14 @@ namespace ListsProject2
         {
             if (Length == 0)
             {
-                return 0; // ПЕРЕДЕЛАТЬ (возвращать что-то другое)
+                throw new Exception("ArrayList object is empty");
             }
 
             int minIndex = 0;
 
             for (int i = 1; i < Length; i++)
             {
-                if (_array[i] < minIndex)
+                if (_array[i] < _array[minIndex])
                 {
                     minIndex = i;
                 }
@@ -368,7 +377,8 @@ namespace ListsProject2
         }
 
         // 19. Сортировка по возрастанию
-        public void UpSort()
+        // пузырьком
+        public void UpSortBubble()
         {
             for (int i = 0; i < Length; i++)
             {
@@ -381,6 +391,108 @@ namespace ListsProject2
                         _array[j] = tmp;
                     }
                 }
+            }
+        }
+
+        // вставками
+        public void UpSortInsertions()
+        {
+            int tmp;
+
+            for (int i = 1; i < Length; i++)
+            {
+                int j = i - 1;
+                tmp = _array[i];
+
+                while (j >= 0 && _array[j] > tmp)
+                {
+                    _array[j + 1] = _array[j];
+                    _array[j] = tmp;
+                    j--;
+                }
+            }
+        }
+
+        // быстрая сортировка
+        public ArrayList UpSortQuick_FirstTry()
+        {      
+            if (Length == 0)
+            {
+                return this;
+            }
+            if (Length == 1)
+            {
+                return this;
+            }
+            else
+            {
+                ArrayList left = new ArrayList();
+                ArrayList right = new ArrayList();
+                int endsMean = (this[0] + this[Length - 1]) / 2;
+
+                for (int i = 0; i < Length; i++)
+                {
+                    if (this[i] <= endsMean)
+                    {
+                        left.Add(this[i]);
+                    }
+                    else
+                    {
+                        right.Add(this[i]);
+                    }
+                }
+
+                left = left.UpSortQuick();
+                right = right.UpSortQuick();
+
+                return left.Concatenate(right);
+            }
+        }
+
+
+        public ArrayList UpSortQuick()
+        {
+            int[] tmp = GetIntArray();
+            tmp = UpSortQuickForInts(tmp);
+            ArrayList list = new ArrayList(tmp);
+
+            return list;
+        }
+
+        public int[] UpSortQuickForInts(int[] array)
+        {
+            if (array.Length == 0)
+            {
+                return array;
+            }
+            if (array.Length == 1)
+            {
+                return array;
+            }
+            else
+            {
+                int[] left = new int[0];
+                int[] right = new int[0];
+                int p = (array[0] + array[array.Length - 1]) / 2;
+
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array[i] <= p)
+                    {
+                        Array.Resize(ref left, left.Length + 1);
+                        left[left.Length - 1] = array[i];
+                    }
+                    else
+                    {
+                        Array.Resize(ref right, right.Length + 1);
+                        right[right.Length - 1] = array[i];
+                    }
+                }
+
+                left = UpSortQuickForInts(left);
+                right = UpSortQuickForInts(right);
+
+                return left.Concat(right).ToArray();
             }
         }
 
@@ -402,7 +514,7 @@ namespace ListsProject2
         }
 
         // 21. Удаление по значению первого
-        public int RemoveOneByValue(int value)
+        public int RemoveFirstWithValue(int value)
         {
             int index = -1;
 
@@ -411,18 +523,17 @@ namespace ListsProject2
                 if (_array[i] == value)
                 {
                     index = i;
+                    MoveLeftFromIndexByNumber(index + 1, 1);
+                    Length--;
                     break;
                 }
             }
-
-            MoveLeftFromIndexByNumber(index + 1, 1);
-            Length--;
 
             return index;
         }
 
         // 22. Удаление по значению всех
-        public int RemoveAllByValue(int value)
+        public int RemoveAllWithValue(int value)
         {
             int[] tmp = new int[0];
             int count = 0;
@@ -484,7 +595,7 @@ namespace ListsProject2
             return base.GetHashCode();
         }
 
-        // приватные
+        // Приватные
         private void ChangeLength(int newLength)
         {
             int[] tmpArray = new int[newLength];
@@ -531,6 +642,22 @@ namespace ListsProject2
             {
                 _array[i + index] = values[i];
             }
+        }
+
+        public ArrayList Concatenate (ArrayList list)
+        {
+            int[] listInts = list.GetIntArray();
+            Add(listInts);
+
+            return this;
+        }
+
+        public int[] GetIntArray()
+        {
+            int[] ints = _array;
+            Array.Resize(ref ints, Length);            
+            
+            return ints;
         }
     }
 }
